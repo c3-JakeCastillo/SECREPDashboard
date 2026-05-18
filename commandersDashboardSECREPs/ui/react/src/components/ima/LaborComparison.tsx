@@ -4,7 +4,7 @@ import type { TimeRange } from "../../types";
 
 interface Props { timeRange: TimeRange }
 
-export default function LaborComparison({ timeRange: _ }: Props) {
+export default function LaborComparison(_props: Props) {
   const current = seedData.monthly_closures.find((m) => m.months_ago === 0);
   if (!current) return null;
 

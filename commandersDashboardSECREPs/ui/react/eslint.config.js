@@ -46,6 +46,7 @@ module.exports = [
       ...a11y.configs.recommended.rules,
       ...imp.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
       "import/no-unresolved": "off",
       "import/extensions": "off",
       "import/no-absolute-path": "off",

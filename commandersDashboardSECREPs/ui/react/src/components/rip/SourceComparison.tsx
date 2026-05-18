@@ -4,7 +4,7 @@ import type { TimeRange } from "../../types";
 
 interface Props { timeRange: TimeRange }
 
-export default function SourceComparison({ timeRange: _ }: Props) {
+export default function SourceComparison(_props: Props) {
   const summary = seedData.repair_source_summary_current_month;
   if (!summary) return null;
 

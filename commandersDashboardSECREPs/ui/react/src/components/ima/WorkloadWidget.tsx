@@ -4,7 +4,7 @@ import type { TimeRange } from "../../types";
 
 interface Props { timeRange: TimeRange }
 
-export default function WorkloadWidget({ timeRange: _ }: Props) {
+export default function WorkloadWidget(_props: Props) {
   const { open_work_orders_summary: summary } = seedData;
 
   return (

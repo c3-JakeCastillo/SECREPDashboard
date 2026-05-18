@@ -4,7 +4,7 @@ import type { TimeRange } from "../../types";
 
 interface Props { timeRange: TimeRange }
 
-export default function InventoryPosture({ timeRange: _ }: Props) {
+export default function InventoryPosture(_props: Props) {
   const h = seedData.inventory_health;
   const total = h.total_allowance;
   const serv = h.total_serviceable;

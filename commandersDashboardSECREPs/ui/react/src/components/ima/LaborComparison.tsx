@@ -1,21 +1,36 @@
+import { useMemo } from "react";
 import { seedData } from "../../data/loadSeed";
-import { formatMoney, formatPct, formatDays } from "../../data/derive";
+import {
+  aggregateSource,
+  filterMonthlySeries,
+  formatMoney,
+  formatPct,
+  formatDays,
+  timeRangeLabel,
+} from "../../data/derive";
 import type { TimeRange } from "../../types";
 
 interface Props { timeRange: TimeRange }
 
 export default function LaborComparison({ timeRange }: Props) {
-  void timeRange; // will be wired in time-range filter pass
-  const current = seedData.monthly_closures.find((m) => m.months_ago === 0);
-  if (!current) return null;
+  const months = useMemo(
+    () => filterMonthlySeries(seedData.monthly_closures, timeRange),
+    [timeRange]
+  );
 
-  const marine = current.marine;
-  const v2x = current.v2x;
+  const marine = useMemo(() => aggregateSource(months, "marine"), [months]);
+  const v2x    = useMemo(() => aggregateSource(months, "v2x"),    [months]);
+
+  if (months.length === 0) return (
+    <section className="card">
+      <p className="text-sm text-steel">No closure data for selected range.</p>
+    </section>
+  );
 
   return (
     <section className="card">
       <h3 className="text-base font-semibold text-navy mb-3">
-        Labor Performance — Marine vs. Contracted (Current Month)
+        Labor Performance — Marine vs. Contracted ({timeRangeLabel(timeRange)})
       </h3>
       <div className="grid grid-cols-2 gap-4">
         <LaborCard

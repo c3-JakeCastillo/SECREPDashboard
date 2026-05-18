@@ -2,6 +2,7 @@ import { seedData } from "../../data/loadSeed";
 import { formatMoney, formatPct } from "../../data/derive";
 import KPITile from "../shared/KPITile";
 import InventoryPosture from "./InventoryPosture";
+import InventorySankey from "./InventorySankey";
 import LowStockTable from "./LowStockTable";
 import SourceComparison from "./SourceComparison";
 import BudgetTracker from "./BudgetTracker";
@@ -43,6 +44,7 @@ export default function RIPModule({ timeRange }: Props) {
       </section>
 
       <InventoryPosture timeRange={timeRange} />
+      <InventorySankey timeRange={timeRange} />
       <LowStockTable />
       <SourceComparison timeRange={timeRange} />
       <BudgetTracker />

@@ -1,26 +1,42 @@
+import { useMemo } from "react";
 import { seedData } from "../../data/loadSeed";
-import { chronological, formatMoney } from "../../data/derive";
+import {
+  chronological,
+  filterMonthlySeries,
+  formatMoney,
+  timeRangeLabel,
+} from "../../data/derive";
 import Sparkline from "../shared/Sparkline";
 import type { TimeRange } from "../../types";
 
 interface Props { timeRange: TimeRange }
 
 export default function IMATrends({ timeRange }: Props) {
-  void timeRange; // will be wired in time-range filter pass
-  const series = chronological(seedData.monthly_closures);
+  const series = useMemo(
+    () => chronological(filterMonthlySeries(seedData.monthly_closures, timeRange)),
+    [timeRange]
+  );
+
   const labels = series.map((m) => m.month.slice(2));
 
-  const closuresData = series.map((m, i) => ({ label: labels[i], value: m.total_closed }));
+  const closuresData   = series.map((m, i) => ({ label: labels[i], value: m.total_closed }));
   const marineRateData = series.map((m, i) => ({ label: labels[i], value: m.marine.repair_rate * 100 }));
-  const v2xRateData = series.map((m, i) => ({ label: labels[i], value: m.v2x.repair_rate * 100 }));
-  const savingsData = series.map((m, i) => ({
+  const v2xRateData    = series.map((m, i) => ({ label: labels[i], value: m.v2x.repair_rate * 100 }));
+  const savingsData    = series.map((m, i) => ({
     label: labels[i],
     value: m.marine.cost_savings + m.v2x.cost_savings + m.logcom.cost_savings,
   }));
 
+  const rangeTitle = timeRangeLabel(timeRange);
+
   return (
     <section className="card">
-      <h3 className="text-base font-semibold text-navy mb-3">12-Month Trends</h3>
+      <h3 className="text-base font-semibold text-navy mb-3">
+        Trends — {rangeTitle}
+        <span className="ml-2 text-xs font-normal text-steel num">
+          ({series.length} {series.length === 1 ? "month" : "months"})
+        </span>
+      </h3>
       <div className="grid grid-cols-4 gap-4">
         <TrendBox label="Closures / Month" data={closuresData} color="#0B2545" />
         <TrendBox label="Marine Repair Rate (%)" data={marineRateData} color="#8E2932" subFormat="pct" />
@@ -44,14 +60,17 @@ function TrendBox({
 }) {
   const latest = data[data.length - 1]?.value ?? 0;
   const formatted =
-    subFormat === "pct" ? `${latest.toFixed(1)}%`
+    subFormat === "pct"   ? `${latest.toFixed(1)}%`
     : subFormat === "money" ? formatMoney(latest)
     : latest.toFixed(0);
+
   return (
     <div>
       <div className="kpi-label">{label}</div>
       <div className="text-lg font-semibold text-navy num">{formatted}</div>
-      <div className="mt-2"><Sparkline data={data} color={color} height={40} /></div>
+      <div className="mt-2">
+        <Sparkline data={data} color={color} height={40} />
+      </div>
     </div>
   );
 }

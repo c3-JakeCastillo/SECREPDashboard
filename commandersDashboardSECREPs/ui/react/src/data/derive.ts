@@ -1,5 +1,6 @@
 import type {
   MonthlyClosures,
+  MonthlyInventoryFlow,
   RepairJob,
   ServiceRequest,
   TimeRange,
@@ -49,9 +50,65 @@ export function filterMonthlySeries<T extends { months_ago: number }>(
   }
 }
 
+/** How many months back a TimeRange covers (for label display). */
+export function timeRangeLabel(range: TimeRange): string {
+  switch (range) {
+    case "current_month":   return "Current Month";
+    case "last_30_days":    return "Last 30 Days";
+    case "trailing_90_days": return "Trailing 90 Days";
+    case "trailing_12_months": return "Trailing 12 Months";
+    case "custom":          return "All Data";
+  }
+}
+
 /** Sort 12-month series oldest-first for chart rendering. */
 export function chronological<T extends { months_ago: number }>(series: T[]): T[] {
   return [...series].sort((a, b) => b.months_ago - a.months_ago);
+}
+
+/**
+ * Aggregate multiple months of MonthlyClosures into a single synthetic
+ * MonthlySourcePerformance for a given labor source key.
+ */
+export function aggregateSource(
+  months: MonthlyClosures[],
+  source: "marine" | "v2x" | "logcom"
+) {
+  const count     = months.reduce((s, m) => s + m[source].count, 0);
+  const successes = months.reduce((s, m) => s + m[source].successes, 0);
+  const savings   = months.reduce((s, m) => s + m[source].cost_savings, 0);
+  const cwtSum    = months.reduce((s, m) => s + m[source].avg_cwt_days * m[source].count, 0);
+  return {
+    count,
+    successes,
+    repair_rate: count > 0 ? successes / count : 0,
+    avg_cwt_days: count > 0 ? cwtSum / count : 0,
+    cost_savings: savings,
+  };
+}
+
+/**
+ * Aggregate multiple months of inventory flow into a single totals object.
+ * Used by InventorySankey when a multi-month range is selected.
+ */
+export function aggregateInventoryFlow(months: MonthlyInventoryFlow[]): MonthlyInventoryFlow {
+  const sum = (key: keyof MonthlyInventoryFlow) =>
+    months.reduce((s, m) => s + (m[key] as number), 0);
+  return {
+    month: months[0]?.month ?? "",
+    months_ago: months[0]?.months_ago ?? 0,
+    straight_buy_serv:    sum("straight_buy_serv"),
+    mrp_credit_serv:      sum("mrp_credit_serv"),
+    initial_issue_serv:   sum("initial_issue_serv"),
+    ima_repair_serv:      sum("ima_repair_serv"),
+    ima_repair_washout:   sum("ima_repair_washout"),
+    v2x_repair_serv:      sum("v2x_repair_serv"),
+    v2x_repair_washout:   sum("v2x_repair_washout"),
+    logcom_repair_serv:   sum("logcom_repair_serv"),
+    logcom_repair_washout: sum("logcom_repair_washout"),
+    unit_turnin_unserv:   sum("unit_turnin_unserv"),
+    customer_issue_serv:  sum("customer_issue_serv"),
+  };
 }
 
 /** Format a US dollar value compactly: $1.2M, $843K, $412. */
@@ -78,5 +135,5 @@ export function ageTier(daysOpen: number): "ok" | "watch" | "critical" {
   return "ok";
 }
 
-// Re-export MonthlyClosures so consumers don't need to import types separately
-export type { MonthlyClosures };
+// Re-export types so consumers don't need to import from types directly
+export type { MonthlyClosures, MonthlyInventoryFlow };

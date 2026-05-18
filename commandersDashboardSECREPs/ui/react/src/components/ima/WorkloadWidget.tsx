@@ -1,12 +1,53 @@
+import { useMemo } from "react";
 import { seedData } from "../../data/loadSeed";
 import { AlertTriangle } from "lucide-react";
 import type { TimeRange } from "../../types";
 
 interface Props { timeRange: TimeRange }
 
+/** Returns the cutoff date for a TimeRange relative to the seed's as_of_date. */
+function getCutoff(range: TimeRange, asOf: string): Date | null {
+  const anchor = new Date(asOf);
+  switch (range) {
+    case "current_month":
+      return new Date(anchor.getFullYear(), anchor.getMonth(), 1);
+    case "last_30_days":
+      return new Date(anchor.getTime() - 30 * 24 * 60 * 60 * 1000);
+    case "trailing_90_days":
+      return new Date(anchor.getTime() - 90 * 24 * 60 * 60 * 1000);
+    case "trailing_12_months":
+      return new Date(anchor.getTime() - 365 * 24 * 60 * 60 * 1000);
+    case "custom":
+      return null; // no cutoff — show all open WOs
+  }
+}
+
 export default function WorkloadWidget({ timeRange }: Props) {
-  void timeRange; // will be wired in time-range filter pass
-  const { open_work_orders_summary: summary } = seedData;
+  const { open_work_orders_summary, service_requests, meta } = seedData;
+
+  // For non-current ranges, re-derive open WO counts from service_requests
+  const filteredSummary = useMemo(() => {
+    const cutoff = getCutoff(timeRange, meta.as_of_date);
+    if (!cutoff) return open_work_orders_summary;
+
+    const openWOs = service_requests.filter(
+      (sr) => sr.close_date === null && new Date(sr.induction_date) >= cutoff
+    );
+
+    const byStatus = openWOs.reduce((acc, sr) => {
+      acc[sr.status] = (acc[sr.status] ?? 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      total: openWOs.length,
+      by_status: byStatus,
+      aging_over_90_days: open_work_orders_summary.aging_over_90_days,
+      aging_items: open_work_orders_summary.aging_items,
+    };
+  }, [timeRange, service_requests, meta.as_of_date, open_work_orders_summary]);
+
+  const summary = filteredSummary;
 
   return (
     <section className="card">

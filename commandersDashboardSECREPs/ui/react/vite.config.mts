@@ -48,11 +48,11 @@ export default defineConfig(({ command, mode }) => {
       react(),
       // Single eslint2 instance with valid options
       eslint({
-        lintOnStart: true,
+        lintOnStart: false,         // do NOT scan all files on boot (prevents stale in-memory lint cache)
         cache: false,
-        emitErrorAsWarning: true,   // lint errors show as console warnings in dev; never block page render
+        emitErrorAsWarning: true,   // lint findings are warnings only in dev; build is the hard gate
         include: ["src/**/*.{ts,tsx,js,jsx}"],
-        // Exclude tests and build artifacts from dev-time linting to prevent Vite startup failures
+        // Exclude tests and build artifacts from dev-time linting
         exclude: [
           "node_modules/**",
           "dist/**",

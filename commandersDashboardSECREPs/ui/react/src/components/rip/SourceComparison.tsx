@@ -9,6 +9,7 @@ import {
 } from "../../data/derive";
 import type { TimeRange } from "../../types";
 
+
 interface Props { timeRange: TimeRange }
 
 export default function SourceComparison({ timeRange }: Props) {

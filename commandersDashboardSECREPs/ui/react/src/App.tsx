@@ -7,10 +7,12 @@
  * This material may be covered by one or more patents or pending patent applications.
  */
 
-import React from 'react';
-import { Routes } from 'react-router-dom'; // Add Route when adding a new page
-import SideNav from './components/SideNav/SideNav';
-import ErrorReporterProvider from './components/ErrorBoundary/ErrorBoundary';
+import { useState } from "react";
+import Header from "./components/shared/Header";
+import IntegratedView from "./components/integrated/IntegratedView";
+import IMAModule from "./components/ima/IMAModule";
+import RIPModule from "./components/rip/RIPModule";
+import type { ModuleView, TimeRange } from "./types";
 
 if (import.meta.env.MODE === 'development') {
   const authToken = import.meta.env.VITE_C3_AUTH_TOKEN;
@@ -18,16 +20,22 @@ if (import.meta.env.MODE === 'development') {
 }
 
 export default function App() {
+  const [moduleView, setModuleView] = useState<ModuleView>("integrated");
+  const [timeRange, setTimeRange] = useState<TimeRange>("current_month");
+
   return (
-    <ErrorReporterProvider>
-      <div className="h-screen flex max-w-full overflow-hidden">
-        <SideNav />
-        <div className="flex-1 flex flex-col min-w-0">
-          <main className="flex-1 overflow-auto">
-            <Routes>{/* <Route path="/" element={<DemoPage />} /> */}</Routes>
-          </main>
-        </div>
-      </div>
-    </ErrorReporterProvider>
+    <div className="min-h-screen bg-canvas">
+      <Header
+        moduleView={moduleView}
+        onModuleViewChange={setModuleView}
+        timeRange={timeRange}
+        onTimeRangeChange={setTimeRange}
+      />
+      <main className="max-w-[1920px] mx-auto px-6 py-6">
+        {moduleView === "integrated" && <IntegratedView timeRange={timeRange} />}
+        {moduleView === "ima_only" && <IMAModule timeRange={timeRange} />}
+        {moduleView === "rip_only" && <RIPModule timeRange={timeRange} />}
+      </main>
+    </div>
   );
 }

@@ -190,3 +190,27 @@
     transform: none;
   }
 }
+
+/* ============================================================
+   Commanders Dashboard for SECREPs — component utilities
+   ============================================================ */
+
+/* Tabular numerals for KPI alignment — registered as a Tailwind v4 utility */
+@utility num {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@layer components {
+  .card {
+    @apply bg-surface rounded-lg border border-slate-200 p-4 shadow-sm;
+  }
+  .kpi-label {
+    @apply text-xs uppercase tracking-wide text-steel font-medium;
+  }
+  .kpi-value {
+    @apply text-3xl font-semibold text-navy num leading-none mt-1;
+  }
+  .kpi-sub {
+    @apply text-xs text-steel mt-1 num;
+  }
+}

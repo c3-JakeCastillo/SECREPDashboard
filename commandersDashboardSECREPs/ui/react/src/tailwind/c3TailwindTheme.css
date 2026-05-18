@@ -9,6 +9,16 @@
 
 /* Tailwind CSS v4 Theme Configuration for C3 Design System */
 @theme {
+  /* === Commanders Dashboard Brand Tokens === */
+  --color-navy: #0B2545;
+  --color-scarlet: #8E2932;
+  --color-steel: #5C6B73;
+  --color-contractor-blue: #1F4E79;
+  --color-canvas: #F7F8FA;
+  --color-surface: #FFFFFF;
+  --color-success: #1F7A4D;
+  --color-warning: #C77700;
+  --color-critical: #B3261E;
   /* Core Gray Scale - Mapped to Tailwind scale */
   --color-gray-50: var(--c3-style-color-core-gray-10);
   --color-gray-100: var(--c3-style-color-core-gray-20);

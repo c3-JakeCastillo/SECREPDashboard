@@ -30,3 +30,8 @@ testReports
 !tsconfig.json
 
 *.env
+
+# ESLint and Vite caches (can cause stale lint errors across processes)
+.eslintcache
+react/.eslintcache
+react/node_modules/.vite/

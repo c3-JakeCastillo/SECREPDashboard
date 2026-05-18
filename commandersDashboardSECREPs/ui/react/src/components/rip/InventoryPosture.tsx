@@ -4,7 +4,8 @@ import type { TimeRange } from "../../types";
 
 interface Props { timeRange: TimeRange }
 
-export default function InventoryPosture(_props: Props) {
+export default function InventoryPosture({ timeRange }: Props) {
+  void timeRange; // will be wired in time-range filter pass
   const h = seedData.inventory_health;
   const total = h.total_allowance;
   const serv = h.total_serviceable;

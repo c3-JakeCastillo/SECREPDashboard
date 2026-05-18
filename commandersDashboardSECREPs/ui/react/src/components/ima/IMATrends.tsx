@@ -5,7 +5,8 @@ import type { TimeRange } from "../../types";
 
 interface Props { timeRange: TimeRange }
 
-export default function IMATrends(_props: Props) {
+export default function IMATrends({ timeRange }: Props) {
+  void timeRange; // will be wired in time-range filter pass
   const series = chronological(seedData.monthly_closures);
   const labels = series.map((m) => m.month.slice(2));
 

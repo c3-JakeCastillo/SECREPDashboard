@@ -50,6 +50,7 @@ export default defineConfig(({ command, mode }) => {
       eslint({
         lintOnStart: true,
         cache: false,
+        emitErrorAsWarning: true,   // lint errors show as console warnings in dev; never block page render
         include: ["src/**/*.{ts,tsx,js,jsx}"],
         // Exclude tests and build artifacts from dev-time linting to prevent Vite startup failures
         exclude: [
